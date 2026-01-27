@@ -1,8 +1,6 @@
 import { UrlConfig, MonitoringResult } from "./types";
 
-export async function checkUrl(
-  urlConfig: UrlConfig,
-): Promise<MonitoringResult> {
+export async function checkUrl(urlConfig: UrlConfig): Promise<MonitoringResult> {
   const startTime = Date.now();
   const responseTime = Date.now() - startTime;
 
@@ -27,9 +25,7 @@ export async function checkUrl(
       status: response.status,
       success,
       responseTime,
-      error: success
-        ? undefined
-        : `Expected ${urlConfig.expectedStatus}, got ${response.status}`,
+      error: success ? undefined : `Expected ${urlConfig.expectedStatus}, got ${response.status}`,
     };
   } catch (error) {
     return {

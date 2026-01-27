@@ -1,62 +1,72 @@
-import { Hono } from "hono";
 import { URLS } from "./urls";
 import { Bindings } from "./types";
 import { checkUrl } from "./checkUrl";
 import { sendTelegramAlert } from "./sendAlert";
-import { requestId } from "hono/request-id";
-import { logger } from "hono/logger";
-import { prettyJSON } from "hono/pretty-json";
 import { handleScheduled } from "./scheduler";
 
-const app = new Hono<{ Bindings: Bindings }>();
+function generateRequestId(): string {
+  return crypto.randomUUID();
+}
 
-app.use(requestId(), logger(), prettyJSON());
-
-app.get("/check", async (c) => {
-  const results = await Promise.all(
-    URLS.map((urlConfig) => checkUrl(urlConfig)),
-  );
-
-  const hasFailures = results.some((r) => !r.success);
-
-  return c.json({
-    timestamp: new Date().toISOString(),
-    status: hasFailures ? "issues_detected" : "all_ok",
-    results,
+function jsonResponse(data: unknown, status: number = 200): Response {
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
+    headers: { "Content-Type": "application/json" },
   });
-});
-
-app.get("/health", (c) => {
-  return c.json({ status: "healthy", timestamp: new Date().toISOString() });
-});
-
-app.notFound((c) => {
-  return c.text("Nope g there's nothing there", 404);
-});
-
-app.get("/test-alert", async (c) => {
-  const testMessage = ` *Test Alert*\n\nThis is a test message from mon on ${new Date().toISOString()}`;
-  const alertSent = await sendTelegramAlert(testMessage, c.env);
-
-  return c.json({
-    message: "Test alert sent",
-    success: alertSent,
-    timestamp: new Date().toISOString(),
-  });
-});
-
-app.get("/", (c) => {
-  return c.redirect(
-    "https://image.tmdb.org/t/p/original/oL0k5JA53PyoHSZqKb3cNkhwBCE.jpg",
-  );
-});
+}
 
 export default {
-  fetch: app.fetch,
-  scheduled: async (
-    env: Bindings,
-    ctx: ExecutionContext,
-  ): Promise<void> => {
+  async fetch(request: Request, env: Bindings): Promise<Response> {
+    const url = new URL(request.url);
+    const requestId = generateRequestId();
+    const timestamp = new Date().toISOString();
+
+    console.log(`[${requestId}] ${request.method} ${url.pathname}`);
+
+    if (url.pathname === "/check") {
+      const results = await Promise.all(URLS.map((urlConfig) => checkUrl(urlConfig)));
+
+      const hasFailures = results.some((r) => !r.success);
+
+      console.log(`[${requestId}] /check - ${hasFailures ? "issues_detected" : "all_ok"}`);
+
+      return jsonResponse({
+        timestamp,
+        status: hasFailures ? "issues_detected" : "all_ok",
+        results,
+      });
+    }
+
+    if (url.pathname === "/health") {
+      console.log(`[${requestId}] /health - healthy`);
+      return jsonResponse({ status: "healthy", timestamp });
+    }
+
+    if (url.pathname === "/test-alert") {
+      const testMessage = ` *Test Alert*\n\nThis is a test message from mon on ${timestamp}`;
+      const alertSent = await sendTelegramAlert(testMessage, env);
+
+      console.log(`[${requestId}] /test-alert - sent: ${alertSent}`);
+
+      return jsonResponse({
+        message: "Test alert sent",
+        success: alertSent,
+        timestamp,
+      });
+    }
+
+    if (url.pathname === "/") {
+      console.log(`[${requestId}] / - redirect`);
+      return Response.redirect(
+        "https://image.tmdb.org/t/p/original/oL0k5JA53PyoHSZqKb3cNkhwBCE.jpg",
+      );
+    }
+
+    console.log(`[${requestId}] ${url.pathname} - 404`);
+    return new Response("Nope g there's nothing there", { status: 404 });
+  },
+
+  scheduled: async (env: Bindings, ctx: ExecutionContext): Promise<void> => {
     ctx.waitUntil(handleScheduled(env));
   },
 };

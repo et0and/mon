@@ -4,14 +4,21 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "prepare": "husky",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "^4.11.6",
-    "pino": "^10.3.0",
-    "pino-http": "^11.0.0"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "oxfmt": "^0.27.0",
+    "oxlint": "^1.42.0",
     "wrangler": "^4.4.0"
   }
 }

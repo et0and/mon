@@ -9,9 +9,7 @@ import { URLS } from "./urls";
 export async function handleScheduled(env: Bindings): Promise<Response> {
   console.log("Running scheduled monitoring check...");
 
-  const results = await Promise.all(
-    URLS.map((urlConfig) => checkUrl(urlConfig)),
-  );
+  const results = await Promise.all(URLS.map((urlConfig) => checkUrl(urlConfig)));
 
   const previousStates = await Promise.all(
     results.map((result) => getServiceState(result.name, env)),
@@ -29,12 +27,8 @@ export async function handleScheduled(env: Bindings): Promise<Response> {
       name: result.name,
       url: result.url,
       isDown: !result.success,
-      lastFailureTime: result.success
-        ? previousState?.lastFailureTime
-        : timestamp,
-      lastSuccessTime: result.success
-        ? timestamp
-        : previousState?.lastSuccessTime,
+      lastFailureTime: result.success ? previousState?.lastFailureTime : timestamp,
+      lastSuccessTime: result.success ? timestamp : previousState?.lastSuccessTime,
     };
 
     if (previousState?.isDown && result.success) {
@@ -42,7 +36,7 @@ export async function handleScheduled(env: Bindings): Promise<Response> {
       console.log(`Service recovered: ${result.name}`);
     }
 
-    if ((!previousState?.isDown) && !result.success) {
+    if (!previousState?.isDown && !result.success) {
       newFailures.push(result);
       console.log(`Service failed: ${result.name}`);
     }

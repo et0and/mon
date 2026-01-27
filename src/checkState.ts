@@ -13,10 +13,7 @@ export async function getServiceState(
   }
 }
 
-export async function saveServiceState(
-  state: ServiceState,
-  env: Bindings,
-): Promise<void> {
+export async function saveServiceState(state: ServiceState, env: Bindings): Promise<void> {
   try {
     await env.SERVICE_STATE.put(`service:${state.name}`, JSON.stringify(state));
   } catch (error) {

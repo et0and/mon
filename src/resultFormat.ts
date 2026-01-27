@@ -8,9 +8,7 @@ export function formatResults(results: MonitoringResult[]): string {
     return (
       ` *Mon*\n\n` +
       `All services are operational at ${timestamp}\n\n` +
-      results
-        .map((r) => `• ${r.name}: ${r.status} (${r.responseTime}ms)`)
-        .join("\n")
+      results.map((r) => `• ${r.name}: ${r.status} (${r.responseTime}ms)`).join("\n")
     );
   }
 
@@ -18,32 +16,21 @@ export function formatResults(results: MonitoringResult[]): string {
     ` *Mon alert*\n\n` +
     `${failures.length} service(s) experiencing issues at ${timestamp}\n\n` +
     `*Failed Services:*\n` +
-    failures
-      .map((r) => `• ${r.name}: ${r.error} (${r.responseTime}ms)`)
-      .join("\n") +
+    failures.map((r) => `• ${r.name}: ${r.error} (${r.responseTime}ms)`).join("\n") +
     "\n\n*All Services:*\n" +
     results
-      .map(
-        (r) =>
-          `${r.success ? "✅" : "❌"} ${r.name}: ${r.status} (${
-            r.responseTime
-          }ms)`,
-      )
+      .map((r) => `${r.success ? "✅" : "❌"} ${r.name}: ${r.status} (${r.responseTime}ms)`)
       .join("\n")
   );
 }
 
-export function formatRecoveryResults(
-  recoveredServices: MonitoringResult[],
-): string {
+export function formatRecoveryResults(recoveredServices: MonitoringResult[]): string {
   const timestamp = new Date().toISOString();
 
   return (
     ` *Mon services recovery*\n\n` +
     `${recoveredServices.length} service(s) have recovered at ${timestamp}\n\n` +
     `*Recovered Services:*\n` +
-    recoveredServices
-      .map((r) => `• ${r.name}: ${r.status} (${r.responseTime}ms)`)
-      .join("\n")
+    recoveredServices.map((r) => `• ${r.name}: ${r.status} (${r.responseTime}ms)`).join("\n")
   );
 }

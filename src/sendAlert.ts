@@ -1,9 +1,6 @@
 import { Bindings } from "./types";
 
-export async function sendTelegramAlert(
-  message: string,
-  env: Bindings,
-): Promise<boolean> {
+export async function sendTelegramAlert(message: string, env: Bindings): Promise<boolean> {
   try {
     const telegramUrl = `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`;
 
