@@ -1,3 +1,4 @@
+import { HttpStatus } from "./http";
 import { Bindings } from "./types";
 
 export async function sendTelegramAlert(message: string, env: Bindings): Promise<boolean> {
@@ -18,7 +19,7 @@ export async function sendTelegramAlert(message: string, env: Bindings): Promise
 
     return response.ok;
   } catch (error) {
-    console.error("Failed to send Telegram alert:", error);
+    console.error("Failed to send Telegram alert:", error, HttpStatus.InternalServerError);
     return false;
   }
 }

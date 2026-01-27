@@ -3,12 +3,13 @@ import { Bindings } from "./types";
 import { checkUrl } from "./checkUrl";
 import { sendTelegramAlert } from "./sendAlert";
 import { handleScheduled } from "./scheduler";
+import { HttpStatus } from "./http";
 
 function generateRequestId(): string {
   return crypto.randomUUID();
 }
 
-function jsonResponse(data: unknown, status: number = 200): Response {
+function jsonResponse(data: unknown, status: number = HttpStatus.Ok): Response {
   return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: { "Content-Type": "application/json" },
@@ -39,14 +40,14 @@ export default {
 
     if (url.pathname === "/health") {
       console.log(`[${requestId}] /health - healthy`);
-      return jsonResponse({ status: "healthy", timestamp });
+      return jsonResponse({ status: "healthy", timestamp }, HttpStatus.Ok);
     }
 
     if (url.pathname === "/test-alert") {
       const testMessage = ` *Test Alert*\n\nThis is a test message from mon on ${timestamp}`;
       const alertSent = await sendTelegramAlert(testMessage, env);
 
-      console.log(`[${requestId}] /test-alert - sent: ${alertSent}`);
+      console.log(`[${requestId}] /test-alert - sent: ${alertSent}`, HttpStatus.Created);
 
       return jsonResponse({
         message: "Test alert sent",
@@ -56,14 +57,14 @@ export default {
     }
 
     if (url.pathname === "/") {
-      console.log(`[${requestId}] / - redirect`);
-      return Response.redirect(
-        "https://image.tmdb.org/t/p/original/oL0k5JA53PyoHSZqKb3cNkhwBCE.jpg",
-      );
+      console.log(`[${requestId}] / - monke time`);
+      return Response.redirect(env.SURPRISE_URL, HttpStatus.FunnyMemeStatus);
     }
 
     console.log(`[${requestId}] ${url.pathname} - 404`);
-    return new Response("Nope g there's nothing there", { status: 404 });
+    return new Response("Nope there's nothing there", {
+      status: HttpStatus.NotFound,
+    });
   },
 
   scheduled: async (env: Bindings, ctx: ExecutionContext): Promise<void> => {

@@ -1,7 +1,9 @@
+import { HttpStatus } from "./http";
+
 export interface MonitoringResult {
   url: string;
   name: string;
-  status: number;
+  status: HttpStatus;
   success: boolean;
   responseTime: number;
   error?: string;
@@ -10,7 +12,7 @@ export interface MonitoringResult {
 export interface UrlConfig {
   name: string;
   url: string;
-  expectedStatus: number;
+  expectedStatus: HttpStatus.Ok;
 }
 
 export interface ServiceState {
@@ -24,5 +26,6 @@ export interface ServiceState {
 export type Bindings = {
   TELEGRAM_BOT_TOKEN: string;
   TELEGRAM_CHAT_ID: string;
+  SURPRISE_URL: string;
   SERVICE_STATE: KVNamespace;
 };

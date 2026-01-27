@@ -1,3 +1,4 @@
+import { HttpStatus } from "./http";
 import { UrlConfig, MonitoringResult } from "./types";
 
 export async function checkUrl(urlConfig: UrlConfig): Promise<MonitoringResult> {
@@ -13,7 +14,6 @@ export async function checkUrl(urlConfig: UrlConfig): Promise<MonitoringResult> 
         DNT: "1",
         "Sec-GPC": "1",
       },
-      // 30 second timeout
       signal: AbortSignal.timeout(30000),
     });
 
@@ -31,7 +31,7 @@ export async function checkUrl(urlConfig: UrlConfig): Promise<MonitoringResult> 
     return {
       url: urlConfig.url,
       name: urlConfig.name,
-      status: 0,
+      status: HttpStatus.ServiceUnavailable,
       success: false,
       responseTime,
       error: error instanceof Error ? error.message : "Unknown error",

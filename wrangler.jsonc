@@ -3,6 +3,7 @@
   "name": "mon",
   "main": "src/index.ts",
   "compatibility_date": "2026-01-26",
+  "workers_dev": true,
   "triggers": {
     "crons": ["*/30 * * * *"],
   },
