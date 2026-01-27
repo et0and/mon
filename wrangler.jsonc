@@ -6,4 +6,5 @@
   "triggers": {
     "crons": ["*/30 * * * *"],
   },
+  "kv_namespaces": [{ "binding": "SERVICE_STATE", "id": "a118901836404b0ba457257e16175a0f" }],
 }
