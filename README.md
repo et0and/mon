@@ -28,10 +28,3 @@ Generate types based on Worker configuration:
 ```txt
 bun run cf-typegen
 ```
-
-Pass the `CloudflareBindings` generic when instantiating Hono:
-
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: CloudflareBindings }>();
-```
